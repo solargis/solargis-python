@@ -20,7 +20,18 @@
 
 # Using outside Jupyter notebooks
 
-If you want to run the code outside Jupyter notebook, you need to import `asyncio` lib and call the main function as `asyncio.run(client.retrieve_data())`.
+If you want to run the code outside Jupyter notebook, you need to import `asyncio` lib and call the main function as `asyncio.run(client.retrieve_data())` like this:
+
+```py
+import asyncio
+
+from local_secrets import token
+from sg_api_client import SGAPIClient
+
+client = SGAPIClient(token, dest_folder="/where/you/want/save/your/data")
+client.add_request(site_name="Austria", lat=48.275231, long=14.26934, utc_offset="+01:00")
+datasets = asyncio.run(client.retrieve_data())
+```
 
 
 Alternatively, you can build your own evaluation routines asynchronously and use `await` - if you choose this way, you probably know what to do.
