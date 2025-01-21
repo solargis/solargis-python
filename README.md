@@ -16,7 +16,7 @@
     client.add_request(site_name="Mosambique", lat=15.169717, long=39.253761, utc_offset="+02:00")
     client.add_request(site_name="Afghanistan", lat=37.095622, long=70.557353, utc_offset="+04:30")
     datasets = await client.retrieve_data()
-    s```
+    ```
 
 # Using outside Jupyter notebooks
 
