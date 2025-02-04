@@ -134,7 +134,7 @@ class SGAPIClient:
                 if status == "error":
                     return None, status
                 print(
-                    f'[{datetime.datetime.now()} ]Current status of {request_id}: "{status}"'
+                    f'[{datetime.datetime.now()}] Current status of {request_id}: "{status}"'
                 )
                 await asyncio.sleep(4)
 
