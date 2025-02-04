@@ -1,3 +1,8 @@
+# SG API Client
+A simple python client for communication with Solargis API. It submits a request, 
+repeatedly checks for its status until it's done and (on success) saves the downloaded data (.csv)
+and metadata (.json) to your device.
+
 # Quickstart guide
 
 1. Install required libs in `requirements.txt`
@@ -6,7 +11,7 @@
 4. Run jupyter notebook server
 5. Import required assets 
     ```py
-    from sg_api_client import SG2APIClient
+    from sg_api_client import SGAPIClient
     from local_secrets import token
     ```
 6. Try obtaining some data, e.g.
@@ -34,4 +39,5 @@ datasets = asyncio.run(client.retrieve_data())
 ```
 
 
-Alternatively, you can build your own evaluation routines asynchronously and use `await` - if you choose this way, you probably know what to do.
+Alternatively, you can build your own evaluation routines asynchronously and use `await` - 
+if you choose this way you probably know what to do.
