@@ -1,2 +1,2 @@
-aiohttp
-pandas
+aiohttp==3.11.11
+pandas==2.2.3
