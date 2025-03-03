@@ -41,3 +41,36 @@ datasets = asyncio.run(client.retrieve_data())
 
 Alternatively, you can build your own evaluation routines asynchronously and use `await` - 
 if you choose this way you probably know what to do.
+
+# Specifying module mounting
+
+Module mounting is specified in the `gtiConfiguration` section (GTI = Global Tilted Irradiance). See [solargis schemas](https://github.com/solargis/schemas/tree/main/examples/requests/public/ts_api) repository for more examples.
+
+```py
+gti_configuration = {
+  "layout":{
+    "azimuth":180,
+    "mounting":{
+      "type":"FIXED_ONE_ANGLE",
+      "tilt":30
+    }
+  }
+}
+
+
+client = SGAPIClient(
+    token, 
+    dest_folder="/where/you/want/save/your/data"
+)
+client.add_request(
+   site_name="Austria",
+   parameters=["GHI", "GTI"],
+   lat=48.275231,
+   long=14.26934,
+   terrainShadig=True,
+   utc_offset="+01:00",
+   time_step="P1Y",
+   gtiConfiguration=gti_configuration
+)
+
+```
