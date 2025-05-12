@@ -7,7 +7,7 @@ and metadata (.json) to your device.
 
 1. Install required libs in `requirements.txt`
 2. Get your API token.
-3. Create a file `local_secrets.py` with contents like this: `token = "<your_API_token>"`
+3. Create a file `local_secrets.py` with the following content: `token = "<your_API_token>"`
 4. Run jupyter notebook server
 5. Import required assets 
     ```py
@@ -25,7 +25,7 @@ and metadata (.json) to your device.
 
 # Using outside Jupyter notebooks
 
-If you want to run the code outside Jupyter notebook, you need to import `asyncio` lib and call the main function as `asyncio.run(client.retrieve_data())` like this:
+If you want to run the code outside Jupyter notebook, you need to import `asyncio` lib and call the main function as `asyncio.run(client.retrieve_data())` as follows:
 
 ```py
 import asyncio
@@ -40,4 +40,37 @@ datasets = asyncio.run(client.retrieve_data())
 
 
 Alternatively, you can build your own evaluation routines asynchronously and use `await` - 
-if you choose this way you probably know what to do.
+if you choose this option you probably know what to do.
+
+# Specifying module mounting
+
+Module mounting is specified in the `gtiConfiguration` section (GTI = Global Tilted Irradiance). See [solargis schemas](https://github.com/solargis/schemas/tree/main/examples/requests/public/ts_api) repository for more examples.
+
+```py
+gti_configuration = {
+  "layout":{
+    "azimuth":180,
+    "mounting":{
+      "type":"FIXED_ONE_ANGLE",
+      "tilt":30
+    }
+  }
+}
+
+
+client = SGAPIClient(
+    token, 
+    dest_folder="/where/you/want/save/your/data"
+)
+client.add_request(
+   site_name="Austria",
+   parameters=["GHI", "GTI"],
+   lat=48.275231,
+   long=14.26934,
+   terrainShadig=True,
+   utc_offset="+01:00",
+   time_step="P1Y",
+   gtiConfiguration=gti_configuration
+)
+
+```
