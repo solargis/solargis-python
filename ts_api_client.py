@@ -1,4 +1,5 @@
 import json
+import pandas as pd
 from sg_api_client_base import SGAPIClient, to_safe_file_label, prettify_file_label
 
 DEFAULT_PARAM_LIST = [
