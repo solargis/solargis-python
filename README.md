@@ -1,3 +1,7 @@
+# Contents
+ 1. [SG API Client](#sg-api-client)
+ 2. [Quickstart guide](#quickstart-guide)
+
 # SG API Client
 A simple python client for communication with Solargis API. It submits a request, 
 repeatedly checks for its status until it's done and (on success) saves the downloaded data (.csv)
