@@ -23,6 +23,7 @@ class SGAPIClient:
         self._headers = {
             "Authorization": f"Bearer {token}",
         }
+        self._request_ids_to_names = {}
 
     def add_request(self, site_name: str, **kwargs):
         kwargs["site_name"] = site_name
@@ -49,18 +50,21 @@ class SGAPIClient:
         requests: dict of {"name": request}
         """
         async with aiohttp.ClientSession() as session:
+            # Step 1: fetch all request IDs in parallel
             tasks = [
-                self.fetch_task_ids(session, request) for request in requests.values()
+                self.fetch_task_ids(session, request, name)
+                for name, request in requests.items()
             ]
-            request_ids = await asyncio.gather(*tasks, return_exceptions=True)
+            await asyncio.gather(*tasks, return_exceptions=True)
 
-            # Create tasks for waiting for data concurrently
-            data_tasks = [
-                self.wait_for_data(session, request_id) for request_id in request_ids
+            wait_tasks = [
+                asyncio.create_task(self.wait_for_data(session, request_id))
+                for request_id in self._request_ids_to_names.keys()
             ]
-            results = await asyncio.gather(*data_tasks, return_exceptions=True)
 
-            for name, (download_url, status) in zip(requests.keys(), results):
+            for finished_task in asyncio.as_completed(wait_tasks):
+                download_url, status, request_id = await finished_task
+                name = self._request_ids_to_names[request_id]
                 if status == "success":
                     data, metadata = await self.read_data(session, download_url, name)
                     yield name, data, metadata
@@ -68,7 +72,7 @@ class SGAPIClient:
                     print(f"Error while retrieving data for {name}, status: {status}")
                     yield name, None, None
 
-    async def fetch_task_ids(self, session, data_request):
+    async def fetch_task_ids(self, session, data_request, name: str):
         print(f"Going to send request to Solargis TS API")
         r = json.dumps(data_request)
         async with session.post(self.url, data=r, headers=self._headers) as response:
@@ -77,6 +81,7 @@ class SGAPIClient:
             if "requestId" in response_json:
                 request_id = response_json.get("requestId")
                 print(f"request_id {request_id} was created")
+                self._request_ids_to_names[request_id] = name
                 return request_id
             else:
                 print(
@@ -86,7 +91,7 @@ class SGAPIClient:
 
     async def wait_for_data(self, session, request_id):
         if request_id is None:
-            return None, "invalid request_id"
+            return None, "invalid request_id", None
         status_endpoint = f"{self.url}/{request_id}"
         status = None
         response_status = {}
@@ -99,17 +104,17 @@ class SGAPIClient:
                     )
                 status = response_status["status"]
                 if status == "error":
-                    return None, status
+                    return None, status, request_id
                 print(
                     f'[{datetime.datetime.now()}] Current status of {request_id}: "{status}"'
                 )
                 await asyncio.sleep(4)
 
         if status == "success":
-            return response_status.get("downloadUrl"), status
+            return response_status.get("downloadUrl"), status, request_id
         else:
             print(f"Error while waiting for data for {request_id}, status: {status}")
-            return None, status
+            return None, status, request_id
 
     @abstractmethod
     async def read_data(self, session, download_url, name):
