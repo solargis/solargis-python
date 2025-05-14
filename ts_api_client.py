@@ -47,7 +47,9 @@ class TSAPIClient(SGAPIClient):
     def __init__(self, dest_folder: str, token: str, url: str = DEFAULT_URL):
         super().__init__(dest_folder=dest_folder, token=token, url=url)
 
-    async def read_data(self, session, download_url, name):
+    async def read_data(
+        self, session: aiohttp.ClientSession, download_url: str, name: str
+    ):
         async with session.get(download_url) as response:
             self._file_labels_from_api[name] = prettify_file_label(response.url.name)
             data_bytes = await response.read()
@@ -106,7 +108,7 @@ class TSAPIClient(SGAPIClient):
 
         return fts_data_request
 
-    def save_data_and_metadata(self, name, data, metadata):
+    def save_data_and_metadata(self, name: str, data: pd.DataFrame, metadata: dict):
         self.dest_folder.mkdir(parents=True, exist_ok=True)
         filename = self._file_labels_from_api.get(name, name)
         try:
