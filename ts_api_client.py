@@ -67,7 +67,7 @@ class TSAPIClient(SGAPIClient):
         site_name: str,
         parameters: list | None = None,
         from_date: str = "AUTODETECT",
-        to_date: str = "LAST_MONTH",  # TODO: what is a reasonable default?
+        to_date: str = "LAST_MONTH",
         time_step: str = "PT15M",
         terrain_shading: bool = True,
         site_elevation: float | None = None,

@@ -7,7 +7,7 @@ import pandas as pd
 
 from sg_api_client_base import SGAPIClient, prettify_file_label, to_safe_file_label
 
-DEFAULT_URL = "https://api-test.solargis.com/tmy/data-request"  # TODO: remove "test"
+DEFAULT_URL = "https://api.solargis.com/tmy/data-request"
 
 
 class TMYAPIClient(SGAPIClient):
@@ -29,6 +29,8 @@ class TMYAPIClient(SGAPIClient):
         create_dataframes: bool. If True, create pandas DataFrames from the API response and hold it in client's
             attribute datasets. If True, the client will ALWAYS download also SOLARGIS_JSON format, even if not
             specified in the request.
+
+        save: bool. If True, save the data and metadata to the destination folder.
         """
         requests = requests or self._requests
         self._create_dataframes = create_dataframes

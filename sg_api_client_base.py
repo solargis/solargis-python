@@ -36,6 +36,8 @@ class SGAPIClient:
         and use work with the data in pandas dataframes.
 
         requests: dict of {"name": request}
+
+        save: bool. If True, save the data and metadata to the destination folder.
         """
         async for name, data, metadata in self.retrieve_data(requests, save=save):
             self.datasets[name] = data
