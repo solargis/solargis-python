@@ -1,5 +1,6 @@
 import json
 
+import aiohttp
 import pandas as pd
 
 from sg_api_client_base import SGAPIClient, prettify_file_label, to_safe_file_label
