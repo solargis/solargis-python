@@ -4,8 +4,8 @@ import json
 import zipfile
 
 import pandas as pd
-from sg_api_client_base import SGAPIClient, to_safe_file_label, prettify_file_label
 
+from sg_api_client_base import SGAPIClient, prettify_file_label, to_safe_file_label
 
 DEFAULT_URL = "https://api-test.solargis.com/tmy/data-request"  # TODO: remove "test"
 
@@ -20,7 +20,7 @@ class TMYAPIClient(SGAPIClient):
         self.zipped_files = {}
         self._create_dataframes = False
 
-    async def retrieve_data(
+    async def retrieve_all_data(
         self, requests=None, create_dataframes: bool = False, save=True
     ):
         """
@@ -36,7 +36,7 @@ class TMYAPIClient(SGAPIClient):
             for request in requests.values():
                 if "SOLARGIS_JSON" not in request["outputFormats"]:
                     request["outputFormats"].append("SOLARGIS_JSON")
-        return await super().retrieve_data(requests, save)
+        return await super().retrieve_all_data(requests, save)
 
     async def read_data(self, session, download_url, name):
         async with session.get(download_url) as response:
@@ -59,17 +59,16 @@ class TMYAPIClient(SGAPIClient):
             else:
                 return None, None
 
-    def save_data_and_metadata(self):
+    def save_data_and_metadata(self, name, data, metadata):
         self.dest_folder.mkdir(parents=True, exist_ok=True)
-        for name, data in self.zipped_files.items():
-            filename = self._file_labels_from_api.get(name, name)
-            try:
-                data_path = f"{self.dest_folder}/{filename}"
-                with open(data_path, "wb") as f:
-                    f.write(data)
-                print(f"Zipped data for {name} saved to {data_path}")
-            except Exception as e:
-                print(f"Error while saving data for {name}: {e}")
+        filename = self._file_labels_from_api.get(name, name)
+        try:
+            data_path = f"{self.dest_folder}/{filename}"
+            with open(data_path, "wb") as f:
+                f.write(self.zipped_files[name])
+            print(f"Zipped data for {name} saved to {data_path}")
+        except Exception as e:
+            print(f"Error while saving data for {name}: {e}")
 
     @staticmethod
     def create_request_dict(
@@ -119,13 +118,13 @@ def to_safe_file_label_tmy(file_label: str) -> str:
 
 
 if __name__ == "__main__":
-    from local_secrets import tmy_token
+    from local_secrets import token_tmy
 
-    client = TMYAPIClient(token=tmy_token, dest_folder="delete_me")
+    client = TMYAPIClient(token=token_tmy, dest_folder="delete_me")
     client.add_request(
         site_name="example_site",
         lat=35.317366,
         long=-117.246094,
         outputFormats=["SOLARGIS_JSON", "SOLARGIS_CSV", "SAM", "HELIOSCOPE"],
     )
-    asyncio.run(client.retrieve_data(create_dataframes=True))
+    asyncio.run(client.retrieve_all_data(create_dataframes=True))

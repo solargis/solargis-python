@@ -33,7 +33,7 @@ tmy_client = TMYAPIClient(token=token_tmy, dest_folder="/where/you/want/save/you
 tmy_client.add_request(site_name="Austria", lat=48.275231, long=14.26934)
 tmy_client.add_request(site_name="Mosambique", lat=15.169717, long=39.253761)
 tmy_client.add_request(site_name="Afghanistan", lat=37.095622, long=70.557353)
-await tmy_client.retrieve_data()
+await tmy_client.retrieve_all_data()
 ```
 
  > Note: if you want to run this code outside Jupyter notebook, see [Using outside Jupyter notebooks](using-outside-jupyter-notebooks).
@@ -68,28 +68,49 @@ ts_client = TSAPIClient(token_ts, dest_folder="/where/you/want/save/your/data")
 ts_client.add_request(site_name="Austria", lat=48.275231, long=14.26934, utc_offset="+01:00")
 ts_client.add_request(site_name="Mosambique", lat=15.169717, long=39.253761, utc_offset="+02:00")
 ts_client.add_request(site_name="Afghanistan", lat=37.095622, long=70.557353, utc_offset="+04:30")
-datasets = await ts_client.retrieve_data()
+datasets = await ts_client.retrieve_all_data()
 ```
  > Note: if you want to run this code outside Jupyter notebook, see [Using outside Jupyter notebooks](using-outside-jupyter-notebooks).
 
 # Using outside Jupyter notebooks
 
-If you want to run the code outside Jupyter notebook, you need to import `asyncio` lib and call the main function as `asyncio.run(client.retrieve_data())` as follows:
+If you want to run the code outside Jupyter notebook, you need to import `asyncio` lib and call the main function as `asyncio.run(client.retrieve_all_data())` as follows:
 
 ```py
 import asyncio
 
-from local_secrets import token
-from sg_api_client import SGAPIClient
+from local_secrets import token_tmy
+from tmy_api_client import TMYAPIClient
 
-client = SGAPIClient(token, dest_folder="/where/you/want/save/your/data")
-client.add_request(site_name="Austria", lat=48.275231, long=14.26934, utc_offset="+01:00")
-datasets = asyncio.run(client.retrieve_data())
+client = TMYAPIClient(token_tmy, dest_folder="/where/you/want/save/your/data")
+client.add_request(site_name="Austria", lat=48.275231, long=14.26934)
+datasets = asyncio.run(client.retrieve_all_data())
 ```
 
 
-Alternatively, you can build your own evaluation routines asynchronously and use `await` - 
-if you choose this option you probably know what to do.
+Alternatively, you can build your own evaluation routines asynchronously. This way, the program doesn't need to 
+wait until all requests are answered and can start data processing as soon as data for any request is available. 
+
+```py
+import asyncio
+import pandas as pd
+
+from local_secrets import token_ts
+from ts_api_client import TSAPIClient
+
+def process_data(name: str, dataset: pd.Dataframe, metadata: dict):
+    ... # your custom function for data processing
+
+async def main(client: TSAPIClient):
+    async for name, dataset, metadata in client.retrieve_data():
+        process_data(name, dataset, metadata)
+
+client = TSAPIClient(token_ts, dest_folder="/where/you/want/save/your/data")
+client.add_request(site_name="Austria", lat=48.275231, long=14.26934, utc_offset="+01:00")
+
+asyncio.run(main(client))
+```
+
 
 # Specifying module mounting in TS requests
 
@@ -106,7 +127,6 @@ gti_configuration = {
   }
 }
 
-
 client = TSAPIClient(
     token, 
     dest_folder="/where/you/want/save/your/data"
@@ -121,5 +141,4 @@ client.add_request(
    time_step="P1Y",
    gtiConfiguration=gti_configuration
 )
-
 ```

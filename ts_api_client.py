@@ -2,8 +2,7 @@ import json
 
 import pandas as pd
 
-from sg_api_client_base import (SGAPIClient, prettify_file_label,
-                                to_safe_file_label)
+from sg_api_client_base import SGAPIClient, prettify_file_label, to_safe_file_label
 
 DEFAULT_PARAM_LIST = [
     "GHI",
@@ -46,7 +45,7 @@ class TSAPIClient(SGAPIClient):
     """
 
     def __init__(self, dest_folder: str, token: str, url: str = DEFAULT_URL):
-        super().__init__(dest_folder, token, url)
+        super().__init__(dest_folder=dest_folder, token=token, url=url)
 
     async def read_data(self, session, download_url, name):
         async with session.get(download_url) as response:
@@ -107,20 +106,19 @@ class TSAPIClient(SGAPIClient):
 
         return fts_data_request
 
-    def save_data_and_metadata(self):
+    def save_data_and_metadata(self, name, data, metadata):
         self.dest_folder.mkdir(parents=True, exist_ok=True)
-        for name, data in self.datasets.items():
-            filename = self._file_labels_from_api.get(name, name)
-            try:
-                data_path = f"{self.dest_folder}/{filename}.csv"
-                data.to_csv(data_path)
-                print(f"Data for {name} saved to {data_path}")
-            except Exception as e:
-                print(f"Error while saving data for {name}: {e}")
-            try:
-                metadata_path = f"{self.dest_folder}/{filename}_metadata.json"
-                with open(metadata_path, "w") as f:
-                    json.dump(self.metadata[name], f)
-                    print(f"Metadata for {name} saved to {metadata_path}")
-            except Exception as e:
-                print(f"Error while saving metadata for {name}: {e}")
+        filename = self._file_labels_from_api.get(name, name)
+        try:
+            data_path = f"{self.dest_folder}/{filename}.csv"
+            data.to_csv(data_path)
+            print(f"Data for {name} saved to {data_path}")
+        except Exception as e:
+            print(f"Error while saving data for {name}: {e}")
+        try:
+            metadata_path = f"{self.dest_folder}/{filename}_metadata.json"
+            with open(metadata_path, "w") as f:
+                json.dump(metadata, f)
+                print(f"Metadata for {name} saved to {metadata_path}")
+        except Exception as e:
+            print(f"Error while saving metadata for {name}: {e}")

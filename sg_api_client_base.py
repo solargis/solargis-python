@@ -30,35 +30,53 @@ class SGAPIClient:
         request = self.create_request_dict(**kwargs)
         self._requests[site_name] = request
 
-    async def retrieve_data(self, requests=None, save=True):
+    async def retrieve_all_data(self, requests=None, save=True):
         """
+        Use this method to retrieve all data from the API, wait until all requests are finished
+        and use work with the data in pandas dataframes.
+
         requests: dict of {"name": request}
         """
+        async for name, data, metadata in self.retrieve_data(requests, save=save):
+            self.datasets[name] = data
+            self.metadata[name] = metadata
+
+        # Return the dict of all datasets
+        return self.datasets
+
+    async def retrieve_data(self, requests: dict | None = None, save: bool = True):
+        """
+        Use this method to asynchronously retrieve data from the API. You can start processing
+        result of each request as soon as it is finished while the other requests are still running.
+
+        requests: dict of {"name": request}
+
+        yields (name, data, metadata) for each request
+        """
+
         if not requests:
             requests = self._requests
         else:
             self._requests = requests
-        async for name, data, metadata in self._retrieve_data(requests):
-            self.datasets[name] = data
-            self.metadata[name] = metadata
-        if save:
-            self.save_data_and_metadata()
-        return self.datasets
 
-    async def _retrieve_data(self, requests: dict):
-        """
-        requests: dict of {"name": request}
-        """
         async with aiohttp.ClientSession() as session:
             # Step 1: fetch all request IDs in parallel
             tasks = [
                 self.fetch_task_ids(session, request, name)
                 for name, request in requests.items()
             ]
-            await asyncio.gather(*tasks, return_exceptions=True)
+
+            wait_tasks = []
+            for finished_task in asyncio.as_completed(tasks):
+                request_id = await finished_task
+                if request_id is not None:
+                    wait_tasks.append(request_id)
+                else:
+                    name = self._request_ids_to_names.get(request_id)
+                    yield name, None, None
 
             wait_tasks = [
-                asyncio.create_task(self.wait_for_data(session, request_id))
+                self.wait_for_data(session, request_id)
                 for request_id in self._request_ids_to_names.keys()
             ]
 
@@ -67,6 +85,8 @@ class SGAPIClient:
                 name = self._request_ids_to_names[request_id]
                 if status == "success":
                     data, metadata = await self.read_data(session, download_url, name)
+                    if save:
+                        self.save_data_and_metadata(name, data, metadata)
                     yield name, data, metadata
                 else:
                     print(f"Error while retrieving data for {name}, status: {status}")
@@ -121,7 +141,10 @@ class SGAPIClient:
         return None, None
 
     @abstractmethod
-    def save_data_and_metadata(self):
+    def save_data_and_metadata(self, name, data, metadata):
+        """
+        Save the data and metadata for one finished request to the destination folder.
+        """
         pass
 
     @staticmethod
