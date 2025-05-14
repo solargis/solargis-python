@@ -117,16 +117,3 @@ class TMYAPIClient(SGAPIClient):
 def to_safe_file_label_tmy(file_label: str) -> str:
     safe_but_long = to_safe_file_label(file_label)
     return safe_but_long[:10]
-
-
-if __name__ == "__main__":
-    from local_secrets import token_tmy
-
-    client = TMYAPIClient(token=token_tmy, dest_folder="delete_me")
-    client.add_request(
-        site_name="example_site",
-        lat=35.317366,
-        long=-117.246094,
-        outputFormats=["SOLARGIS_JSON", "SOLARGIS_CSV", "SAM", "HELIOSCOPE"],
-    )
-    asyncio.run(client.retrieve_all_data(create_dataframes=True))
