@@ -3,6 +3,7 @@ import io
 import json
 import zipfile
 
+import aiohttp
 import pandas as pd
 
 from sg_api_client_base import SGAPIClient, prettify_file_label, to_safe_file_label
@@ -21,10 +22,15 @@ class TMYAPIClient(SGAPIClient):
         self._create_dataframes = False
 
     async def retrieve_all_data(
-        self, requests=None, create_dataframes: bool = False, save=True
+        self,
+        requests: dict | None = None,
+        create_dataframes: bool = False,
+        save: bool = True,
     ):
         """
         Retrieve data from the API.
+
+        requests: dict of {"name": request} or None. If you create requests using add_request method, leave this as None.
 
         create_dataframes: bool. If True, create pandas DataFrames from the API response and hold it in client's
             attribute datasets. If True, the client will ALWAYS download also SOLARGIS_JSON format, even if not
@@ -40,7 +46,9 @@ class TMYAPIClient(SGAPIClient):
                     request["outputFormats"].append("SOLARGIS_JSON")
         return await super().retrieve_all_data(requests, save)
 
-    async def read_data(self, session, download_url, name):
+    async def read_data(
+        self, session: aiohttp.ClientSession, download_url: str, name: str
+    ):
         async with session.get(download_url) as response:
             self._file_labels_from_api[name] = prettify_file_label(response.url.name)
             data_bytes_zipped = await response.read()
@@ -61,7 +69,7 @@ class TMYAPIClient(SGAPIClient):
             else:
                 return None, None
 
-    def save_data_and_metadata(self, name, data, metadata):
+    def save_data_and_metadata(self, name: str, data, metadata):
         self.dest_folder.mkdir(parents=True, exist_ok=True)
         filename = self._file_labels_from_api.get(name, name)
         try:
