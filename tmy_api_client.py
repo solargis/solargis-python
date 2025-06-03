@@ -124,3 +124,21 @@ class TMYAPIClient(SGAPIClient):
 def to_safe_file_label_tmy(file_label: str) -> str:
     safe_but_long = to_safe_file_label(file_label)
     return safe_but_long[:10]
+
+def tmy(token_tmy_api: str, lat: float, long: float, time_step: str, integration_api_call: bool = False, **kwargs):
+    import asyncio
+    if integration_api_call:
+        site_name = f"Pro example Site"
+        url = "https://api.solargis.com/tmy-integration/data-request"
+    else:
+        site_name = f"{lat}_{long}"
+        url = "https://api.solargis.com/tmy/data-request"
+
+    client = TMYAPIClient(token=token_tmy_api, dest_folder="", url=url)
+    client.add_request(
+        site_name=site_name, lat=lat, long=long, timeStep=time_step, **kwargs
+    )
+    datasets = asyncio.run(client.retrieve_all_data(create_dataframes=True))
+
+    return datasets[site_name]
+
