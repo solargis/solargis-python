@@ -95,7 +95,7 @@ class SGAPIClient:
                     yield name, None, None
 
     async def fetch_task_ids(self, session, data_request, name: str):
-        print(f"Going to send request to Solargis TS API")
+        print(f"Going to send request to Solargis API")
         r = json.dumps(data_request)
         async with session.post(self.url, data=r, headers=self._headers) as response:
             response_json = await response.json()
@@ -107,7 +107,7 @@ class SGAPIClient:
                 return request_id
             else:
                 print(
-                    f"Error while sending request to Solargis TS API: {response_json}"
+                    f"Error while sending request to Solargis API: {response_json}"
                 )
                 return None
 
