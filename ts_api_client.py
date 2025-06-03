@@ -124,3 +124,33 @@ class TSAPIClient(SGAPIClient):
                 print(f"Metadata for {name} saved to {metadata_path}")
         except Exception as e:
             print(f"Error while saving metadata for {name}: {e}")
+
+
+def historical_timeseries(
+    token_timeseries_api: str,
+    lat: float,
+    long: float,
+    time_step: str,
+    integration_api_call: bool = False,
+    **kwargs,
+):
+    import asyncio
+    if integration_api_call:
+        site_name = f"Basic example Site"
+        url = "https://api.solargis.com/ts-integration/data-request"
+    else:
+        site_name = f"{lat}_{long}"
+        url = "https://api.solargis.com/ts/data-request"
+
+    ts_client = TSAPIClient(token=token_timeseries_api, dest_folder="", url=url)
+    print("kwargs", kwargs)
+    ts_client.add_request(
+        site_name=site_name,
+        lat=lat,
+        long=long,
+        timeStep=time_step,
+        **kwargs,
+    )
+    datasets = asyncio.run(ts_client.retrieve_all_data())
+
+    return datasets[site_name]
