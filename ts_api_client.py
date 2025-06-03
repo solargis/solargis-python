@@ -84,11 +84,10 @@ class TSAPIClient(SGAPIClient):
             parameters = DEFAULT_PARAM_LIST
 
         fts_data_request: dict = {
-            "requestType": "TIMESERIES",
             "site": {
                 "latitude": lat,
                 "longitude": long,
-                "name": site_name,
+                "siteName": site_name,
             },
             "timeStep": time_step,
             "columns": parameters,
