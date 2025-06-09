@@ -36,11 +36,11 @@ tmy_client.add_request(site_name="Afghanistan", lat=37.095622, long=70.557353)
 await tmy_client.retrieve_all_data()
 ```
 
- > Note: if you want to run this code outside Jupyter notebook, see [Using outside Jupyter notebooks](using-outside-jupyter-notebooks).
+ > Note: if you want to run this code outside Jupyter notebook, see Using outside Jupyter notebooks.
 
  > Note: The time zone is automatically determined from coordinates and may differ from the actual political time zone. Always check file header for time zone info.
 
-In the `add_request()` method, you can specify any subset of [parameters for the TMY request](https://kb.solargis.com/apidocs/generate-tmy-data).
+In the `add_request()` method, you can specify any subset of [parameters for the TMY request]([https://kb.solargis.com/apidocs/generate-tmy-data](https://kb.solargis.com/apidocs/get-requestis-for-tmy-data)).
 
 If you wish to process the data right away, you can also call the `retreive_data` method with `create_dataframes=True`:
 ```py
@@ -50,7 +50,7 @@ tmy_datasets = await tmy_client.retrieve_data(create_dataframes=True)
 
  > Note: with `create_dataframes=True`, the client will always download the data also in SOLARGIS_JSON format. No additional cost will be charged. 
 
-For processing the datasets directly, you might prefer using a python script rather than a notebook - see [Using outside Jupyter notebooks](using-outside-jupyter-notebooks).
+For processing the datasets directly, you might prefer using a python script rather than a notebook - see Using outside Jupyter notebooks.
 
 # Time Series API Quickstart
 Time Series API calls are similar to (TMY API calls)[typical-meteorological-year-api-quickstart]. There are a few notable differences, though: 
