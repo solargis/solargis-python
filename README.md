@@ -15,7 +15,7 @@ repeatedly checks for its status until it's done and (on success) saves the down
     token_tmy = "<your_TMY_API_token>"
     ```
 4. Run jupyter notebook server
-5. Try [TMY](typical-meteorological-year-api-quickstart) or [TS](time-series-api-quickstart) API call - see below.
+5. Try TMY  or TS integration python API call - see below.
 
 
 # Typical Meteorological Year API Quickstart
