@@ -111,7 +111,7 @@ class TMYAPIClient(SGAPIClient):
         kwargs["fileLabel"] = to_safe_file_label_tmy(kwargs["fileLabel"])
 
         default_values = {
-            "outputFormats": ["SOLARGIS_JSON"],
+            "outputFormats": ["SOLARGIS_JSON", "SOLARGIS_CSV"],
             "timeStep": "PT60M",
             "tmyScenario": "P50",
         }
