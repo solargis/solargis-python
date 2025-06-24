@@ -32,7 +32,8 @@ When you created file local_secrets.py from previous step you can easily call TS
 from local_secrets import token_ts  # TODO you need to create this file & variable
 from ts_api_client import historical_timeseries
 SUBHOURLY_15MIN, HOURLY, MONTHLY, YEARLY = "PT15M", "PT60M", "P1M", "P1Y"
-df = historical_timeseries(token_timeseries_api=token_ts, lat=48.275231, long=14.26934, time_step=MONTHLY, columns=["GHI", "DNI"])
+gti_configuration = {"layout":{"azimuth": 180,"mounting": {"type": "FIXED_ONE_ANGLE","tilt": 30}}}
+df = historical_timeseries(token_timeseries_api=token_ts, lat=48.275231, long=14.26934, time_step=MONTHLY, columns=["GHI", "DNI", "GTI"], gtiConfiguration=gti_configuration)
 ```
 
 # Typical Meteorological Year API Quickstart - multiple sites
