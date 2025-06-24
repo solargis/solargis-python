@@ -17,8 +17,17 @@ repeatedly checks for its status until it's done and (on success) saves the down
 4. Run jupyter notebook server
 5. Try TMY  or TS integration python API call - see below.
 
+# Typical Meteorological Year API  - single site
+When you created file local_secrets.py from previous step you can easily call TMY API in one line
+```py
+from local_secrets import token_tmy  # TODO this needs to be created!
+from tmy_api_client import TMYAPIClient, tmy
+SUBHOURLY_15MIN, HOURLY = "PT15M", "PT60M"
+df = tmy(token_tmy_api=token_tmy, lat=48.275231, long=14.26934, time_step=SUBHOURLY_15MIN)
+```
 
-# Typical Meteorological Year API Quickstart
+
+# Typical Meteorological Year API Quickstart - multiple sites
 
 The asynchronous nature of both the API and the client allows processing multiple
 requests in parallel. In a simple scenario, you can specify the sites using only
