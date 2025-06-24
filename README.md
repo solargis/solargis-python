@@ -21,7 +21,7 @@ repeatedly checks for its status until it's done and (on success) saves the down
 When you created file local_secrets.py from previous step you can easily call TMY API in one line. It will also download files to local disk.
 ```py
 from local_secrets import token_tmy  # TODO this needs to be created!
-from tmy_api_client import TMYAPIClient, tmy
+from tmy_api_client import tmy
 SUBHOURLY_15MIN, HOURLY = "PT15M", "PT60M"
 df = tmy(token_tmy_api=token_tmy, lat=48.275231, long=14.26934, time_step=SUBHOURLY_15MIN)
 ```
